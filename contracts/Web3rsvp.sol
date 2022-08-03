@@ -2,6 +2,22 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract Web3RSVP{
+    event NewEventCreated(
+        bytes32 eventID,
+        address creatorAddress,
+        uint256 eventTimestamp,
+        uint256 maxCapacity,
+        uint256 deposit,
+        string eventDataCID
+    );
+
+    event NewRSVP(bytes32 eventID, address attendeeAddress);
+
+    event ConfirmedAttendee(bytes32 eventID, address attendeeAddress);
+
+    event DepositsPaidOut(bytes32 eventID);
+
+
     struct CreateEvent{ 
         bytes32 eventId;   
         string eventDataCID;
@@ -43,6 +59,15 @@ contract Web3RSVP{
             claimedRSVPs,
             false
         );
+
+          emit NewEventCreated(
+            eventId,
+            msg.sender,
+            eventTimestamp,
+            maxCapacity,
+            deposit,
+            eventDataCID
+        );
     }
 
 
@@ -68,11 +93,13 @@ contract Web3RSVP{
 
         //since the function is payable...make payment as the owner of the event by Rsvp'ing so it can be confirmed
         myEvent.confirmedRSVPs.push(payable(msg.sender));
+
+        emit NewRSVP(eventId, msg.sender);
     }
 
 
 // no payment is made on this function as its not marked payable
-    function confirmAttendees(bytes eventId, address attendee) public{
+    function confirmAttendee(bytes eventId, address attendee) public{
         // look up event from our struct using the eventId
          CreateEvent storage myEvent = idToEvent[eventId];
 
@@ -111,6 +138,8 @@ contract Web3RSVP{
         }
 
         require(sent, "Failed to send Ether");
+
+        emit ConfirmedAttendee(eventId, attendee);
     }
 
     function confirmAllAttendees(bytes32 eventId) external {
@@ -161,6 +190,8 @@ contract Web3RSVP{
         }
 
         require(sent, "Failed to send Ether");
+
+        emit DepositsPaidOut(eventId);
 
     }
 
