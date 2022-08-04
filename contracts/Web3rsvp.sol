@@ -72,7 +72,7 @@ contract Web3RSVP{
 
 
     // function to create RSVP
-    function createRsvp(bytes eventId) external payable {
+    function createRsvp(bytes32  eventId) external payable {
         //look up event from our mapping
         CreateEvent storage myEvent = idToEvent[eventId];
 
@@ -80,14 +80,14 @@ contract Web3RSVP{
         require(msg.value == myEvent.deposit, "NOT ENOUGH");
 
         // require that the event hasn't already happened (<eventTimestamp)
-        require(block.timestamp <= myEvent.timestamp, "ALREADY HAPPENDED");
+        require(block.timestamp <= myEvent.eventTimestamp, "ALREADY HAPPENDED");
 
          // make sure event is under max capacity
 
          require(myEvent.confirmedRSVPs.length < myEvent.maxCapacity, "This event has reached capacity");
 
              // require that msg.sender isn't already in myEvent.confirmedRSVPs AKA hasn't already RSVP'd
-        for (uint8 i = 0; index < myEvent.confirmedRSVPs.length; i++) {
+        for (uint8 i = 0; i < myEvent.confirmedRSVPs.length; i++) {
             require(myEvent.confirmedRSVPs[i] != msg.sender, "Already RSVP'd");
         }
 
@@ -99,7 +99,7 @@ contract Web3RSVP{
 
 
 // no payment is made on this function as its not marked payable
-    function confirmAttendee(bytes eventId, address attendee) public{
+    function confirmAttendee(bytes32 eventId, address attendee) public{
         // look up event from our struct using the eventId
          CreateEvent storage myEvent = idToEvent[eventId];
 
