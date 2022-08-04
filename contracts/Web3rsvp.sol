@@ -75,7 +75,7 @@ contract Web3RSVP{
     function createRsvp(bytes32  eventId) external payable {
         //look up event from our mapping
         CreateEvent storage myEvent = idToEvent[eventId];
-
+        
         // transfer deposit to our contract / require that they send in enough ETH to cover the deposit requirement of this specific event
         require(msg.value == myEvent.deposit, "NOT ENOUGH");
 
